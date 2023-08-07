@@ -1,4 +1,9 @@
+from kivy.config import Config
+Config.set('graphics', 'width', '900')
+Config.set('graphics', 'height', '400')
+
 from kivy.app import App
+from kivy.core.window import Window
 from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Line
 from kivy.properties import NumericProperty, Clock
@@ -16,8 +21,12 @@ class MainWidget(Widget):
     horizontal_line_spacing = .1
     horizontal_lines = []
     
-    speed = 4
+    speed_y = 3
     current_offset_y = 0
+    
+    speed_x = 20
+    current_speed_x = 0
+    current_offset_x = 0
     
     
     def __init__(self, **kwargs):
@@ -26,6 +35,7 @@ class MainWidget(Widget):
         self.init_vertical_lines()
         self.init_horizontal_lines()
         Clock.schedule_interval(self.update, 1.0 / 60.0)
+    
             
     def on_parent(self, widget, parent):
         # print("ON PARENT W: " + str(self.width) + " H: " + str(self.height))
@@ -67,7 +77,7 @@ class MainWidget(Widget):
         spacing = self.vertical_line_spacing * self.width
         
         for i in range(0, self.vertical_line_number):
-            line_x = int(center_line_x + offset * spacing)
+            line_x = int(center_line_x + offset * spacing) + self.current_offset_x
             
             x1, y1 = self.transform(line_x, 0)
             x2, y2 = self.transform(line_x, self.height)
@@ -89,8 +99,8 @@ class MainWidget(Widget):
         spacing = self.vertical_line_spacing * self.width
         offset = int(self.vertical_line_number / 2) - 0.5
 
-        x_min = center_line_x - (offset * spacing)
-        x_max = center_line_x + (offset * spacing)
+        x_min = center_line_x - (offset * spacing) + self.current_offset_x
+        x_max = center_line_x + (offset * spacing) + self.current_offset_x
         spacing_y = self.horizontal_line_spacing * self.height
         
         for i in range(0, self.horizontal_line_number):
@@ -128,12 +138,29 @@ class MainWidget(Widget):
         
         return int(transform_x), int(transform_y)
     
+    
+    def on_touch_down(self, touch):
+        if touch.x < self.width / 2:
+            print("Touch left side")
+            self.current_speed_x = self.speed_x
+        elif touch.x > self.width / 2:
+            print("Touch right side")
+            self.current_speed_x -= self.speed_x
+    
+    
+    def on_touch_up(self, touch):
+        print("Up")
+        self.current_speed_x = 0
+    
+    
     def update(self, dt):
         # print("dt: " + str(dt * 60))
         time_factor = dt * 60
         self.update_vertical_lines()
         self.update_horizontal_lines()
-        self.current_offset_y += self.speed * time_factor
+        
+        self.current_offset_y += self.speed_y * time_factor
+        self.current_offset_x += self.current_speed_x * time_factor
         
         spacing_y = self.horizontal_line_spacing * self.height
         if self.current_offset_y >= spacing_y:
