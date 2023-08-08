@@ -6,7 +6,7 @@ from kivy import platform
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.graphics.context_instructions import Color
-from kivy.graphics.vertex_instructions import Line
+from kivy.graphics.vertex_instructions import Line, Quad
 from kivy.properties import NumericProperty, Clock
 from kivy.uix.widget import Widget
 
@@ -18,27 +18,32 @@ class MainWidget(Widget):
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
     
-    vertical_line_number = 10 
-    vertical_line_spacing = .25
+    vertical_line_number = 4
+    vertical_line_spacing = .1
     vertical_lines = []
     
     horizontal_line_number = 15
     horizontal_line_spacing = .1
     horizontal_lines = []
     
-    speed_y = 3
+    speed_y = 1
     current_offset_y = 0
+    current_y_loop = 0
     
-    speed_x = 20
+    speed_x = 1
     current_speed_x = 0
     current_offset_x = 0
     
+    tile = None
+    ti_x = 1
+    ti_y = 2
     
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
         # print("INIT W: " + str(self.width) + " H: " + str(self.height))
         self.init_vertical_lines()
         self.init_horizontal_lines()
+        self.init_tiles()
   
         if self.is_desktop():      
             self._keyboard = Window.request_keyboard(self.keyboard_closed, self)
@@ -58,56 +63,85 @@ class MainWidget(Widget):
     def init_vertical_lines(self):
         with self.canvas:
                 Color(1, 1, 1)
-                # self.line = Line(points = [100, 0, 100, 100])
                 for i in range(0, self.vertical_line_number):
                     self.vertical_lines.append(Line())
-     
+                    
+                
+    def init_horizontal_lines(self):
+        with self.canvas:
+                Color(1, 1, 1)
+                for i in range(0, self.horizontal_line_number):
+                    self.horizontal_lines.append(Line())
+
+
+    def init_tiles(self):
+        with self.canvas:
+                Color(1, 1, 1)
+                self.tile = Quad()
+                
+                
+    def get_line_x_from_index(self, index):      
+        center_line_x = self.perspective_point_x
+        offset = index - 0.5
+        spacing = self.vertical_line_spacing * self.width
+        line_x = center_line_x + (offset * spacing) + self.current_offset_x
+        return line_x
+    
+    
+    def get_line_y_from_index(self, index):
+        spacing_y = self.horizontal_line_spacing * self.height
+        line_y = index * spacing_y - self.current_offset_y      
+        return line_y
+    
+    
+    def get_tile_coordinates(self, ti_x, ti_y):
+        x = self.get_line_x_from_index(ti_x)
+        y = self.get_line_y_from_index(ti_y)
+        return x, y
                 
     def update_vertical_lines(self):
-        center_line_x = int(self.width / 2)
-        # self.Line.points = [center_x, 0, center_x, 100]
-        offset = -int(self.vertical_line_number / 2) + 0.5
-        spacing = self.vertical_line_spacing * self.width
+        first_index = -int(self.vertical_line_number / 2) + 1
         
-        for i in range(0, self.vertical_line_number):
-            line_x = int(center_line_x + offset * spacing) + self.current_offset_x
+        for i in range(first_index, first_index + self.vertical_line_number):
+            line_x = self.get_line_x_from_index(i)
             
             x1, y1 = self.transform(line_x, 0)
             x2, y2 = self.transform(line_x, self.height)
             
             self.vertical_lines[i].points = [x1, y1, x2, y2]
-            offset += 1
      
-            
-    def init_horizontal_lines(self):
-        with self.canvas:
-                Color(1, 1, 1)
-                # self.line = Line(points = [100, 0, 100, 100])
-                for i in range(0, self.horizontal_line_number):
-                    self.horizontal_lines.append(Line())
-            
-                
+                            
     def update_horizontal_lines(self):
-        center_line_x = int(self.width / 2)  
-        spacing = self.vertical_line_spacing * self.width
-        offset = int(self.vertical_line_number / 2) - 0.5
-
-        x_min = center_line_x - (offset * spacing) + self.current_offset_x
-        x_max = center_line_x + (offset * spacing) + self.current_offset_x
-        spacing_y = self.horizontal_line_spacing * self.height
+        first_index = -int(self.vertical_line_number / 2) + 1
+        last_index = first_index + self.vertical_line_number - 1
+        
+        x_min = self.get_line_x_from_index(first_index)
+        x_max = self.get_line_x_from_index(last_index)
         
         for i in range(0, self.horizontal_line_number):
-            line_y = i * spacing_y - self.current_offset_y
+            line_y = self.get_line_y_from_index(i)
             x1, y1 = self.transform(x_min, line_y)
             x2, y2 = self.transform(x_max, line_y)        
             self.horizontal_lines[i].points = [x1, y1, x2, y2]
     
     
+    def update_tiles(self):
+        x_min, y_min = self.get_tile_coordinates(self.ti_x, self.ti_y)
+        x_max, y_max = self.get_tile_coordinates(self.ti_x + 1, self.ti_y + 1)
+    
+        x1, y1 = self.transform(x_min, y_min)
+        x2, y2 = self.transform(x_min, y_max)
+        x3, y3 = self.transform(x_max, y_max)
+        x4, y4 = self.transform(x_max, y_min)
+        
+        self.tile.points = [x1, y1, x2, y2, x3, y3, x4, y4]
+        
     def update(self, dt):
         # print("dt: " + str(dt * 60))
         time_factor = dt * 60
         self.update_vertical_lines()
         self.update_horizontal_lines()
+        self.update_tiles()
         
         self.current_offset_y += self.speed_y * time_factor
         self.current_offset_x += self.current_speed_x * time_factor
@@ -115,7 +149,8 @@ class MainWidget(Widget):
         spacing_y = self.horizontal_line_spacing * self.height
         if self.current_offset_y >= spacing_y:
             self.current_offset_y -= spacing_y
-            
+            self.current_y_loop += 1
+            print("loop: " + str(self.current_y_loop))
             
 class AlpaRun(App):
     pass
