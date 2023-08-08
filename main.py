@@ -22,7 +22,7 @@ class MainWidget(Widget):
     vertical_line_spacing = .1
     vertical_lines = []
     
-    horizontal_line_number = 15
+    horizontal_line_number = 10
     horizontal_line_spacing = .1
     horizontal_lines = []
     
@@ -34,9 +34,11 @@ class MainWidget(Widget):
     current_speed_x = 0
     current_offset_x = 0
     
-    tile = None
-    ti_x = 1
-    ti_y = 2
+    number_of_tiles = 4
+    tiles = []
+    tiles_coordinates = []
+    
+    
     
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
@@ -44,6 +46,7 @@ class MainWidget(Widget):
         self.init_vertical_lines()
         self.init_horizontal_lines()
         self.init_tiles()
+        self.generate_tiles_coordinates()
   
         if self.is_desktop():      
             self._keyboard = Window.request_keyboard(self.keyboard_closed, self)
@@ -77,8 +80,24 @@ class MainWidget(Widget):
     def init_tiles(self):
         with self.canvas:
                 Color(1, 1, 1)
-                self.tile = Quad()
-                
+                for i in range(0, self.number_of_tiles):
+                    self.tiles.append(Quad())
+                    
+    
+    def generate_tiles_coordinates(self):
+        last_y = 0
+        
+        for i in range(len(self.tiles_coordinates) - 1, -1, -1): # Remove the tiles that are off screen
+            if self.tiles_coordinates[i][1] < self.current_y_loop:
+                del self.tiles_coordinates[i]
+        
+        if len(self.tiles_coordinates) > 0:
+            last_coordinates = self.tiles_coordinates[-1]
+            last_y = last_coordinates[1] + 1
+        
+        for i in range(len(self.tiles_coordinates), self.number_of_tiles):
+            self.tiles_coordinates.append((0, last_y))
+            last_y += 1
                 
     def get_line_x_from_index(self, index):      
         center_line_x = self.perspective_point_x
@@ -95,6 +114,7 @@ class MainWidget(Widget):
     
     
     def get_tile_coordinates(self, ti_x, ti_y):
+        ti_y = ti_y - self.current_y_loop
         x = self.get_line_x_from_index(ti_x)
         y = self.get_line_y_from_index(ti_y)
         return x, y
@@ -126,15 +146,19 @@ class MainWidget(Widget):
     
     
     def update_tiles(self):
-        x_min, y_min = self.get_tile_coordinates(self.ti_x, self.ti_y)
-        x_max, y_max = self.get_tile_coordinates(self.ti_x + 1, self.ti_y + 1)
-    
-        x1, y1 = self.transform(x_min, y_min)
-        x2, y2 = self.transform(x_min, y_max)
-        x3, y3 = self.transform(x_max, y_max)
-        x4, y4 = self.transform(x_max, y_min)
+        for i in range(0, self.number_of_tiles):
+            tile = self.tiles[i]
+            tile_coordinates = self.tiles_coordinates[i]
+            
+            x_min, y_min = self.get_tile_coordinates(tile_coordinates[0], tile_coordinates[1])
+            x_max, y_max = self.get_tile_coordinates(tile_coordinates[0] + 1, tile_coordinates[1] + 1)
         
-        self.tile.points = [x1, y1, x2, y2, x3, y3, x4, y4]
+            x1, y1 = self.transform(x_min, y_min)
+            x2, y2 = self.transform(x_min, y_max)
+            x3, y3 = self.transform(x_max, y_max)
+            x4, y4 = self.transform(x_max, y_min)
+            
+            tile.points = [x1, y1, x2, y2, x3, y3, x4, y4]
         
     def update(self, dt):
         # print("dt: " + str(dt * 60))
@@ -150,6 +174,7 @@ class MainWidget(Widget):
         if self.current_offset_y >= spacing_y:
             self.current_offset_y -= spacing_y
             self.current_y_loop += 1
+            self.generate_tiles_coordinates()
             print("loop: " + str(self.current_y_loop))
             
 class AlpaRun(App):
