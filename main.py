@@ -6,8 +6,9 @@ from kivy import platform
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.graphics.context_instructions import Color
-from kivy.graphics.vertex_instructions import Line, Quad, Triangle
+from kivy.graphics.vertex_instructions import Line, Quad, Triangle, Rectangle
 from kivy.properties import NumericProperty, Clock
+from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 import random
 
@@ -19,12 +20,12 @@ class MainWidget(Widget):
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
     
-    vertical_line_number = 20
-    vertical_line_spacing = 0.3
+    vertical_line_number = 12
+    vertical_line_spacing = 0.25
     vertical_lines = []
     
     horizontal_line_number = 8
-    horizontal_line_spacing = .25
+    horizontal_line_spacing = .30
     horizontal_lines = []
     
     speed_y = 5
@@ -43,6 +44,7 @@ class MainWidget(Widget):
     alpa_height = 0.035
     alpa_base_y = 0.04
     alpa = None
+    alpa_image = None
     
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
@@ -50,7 +52,8 @@ class MainWidget(Widget):
         self.init_vertical_lines()
         self.init_horizontal_lines()
         self.init_tiles()
-        self.init_alpa()
+        # self.init_alpa()
+        self.init_alpa_image()
         self.starting_tiles_coordinates()
         self.generate_tiles_coordinates()
   
@@ -72,7 +75,6 @@ class MainWidget(Widget):
         with self.canvas:
             Color(0, 0, 0)
             self.alpa = Triangle()
-            
     
     def update_alpa(self):
         center_x = self.width / 2
@@ -81,37 +83,54 @@ class MainWidget(Widget):
         alpa_half_width = self.alpa_width * (self.width / 2)
         alpa_height = base_y + self.alpa_height * self.height
         
-        x1, y1 = self.transform(center_x - alpa_half_width, base_y)
+        x1, y1 = self.transform(center_x - alpa_half_width, base_y) 
         x2, y2 = self.transform(center_x, alpa_height)
         x3, y3 = self.transform(center_x + alpa_half_width, base_y)
         
+        self.alpa.points = [x1, y1, x2, y2, x3, y3] 
         
-        self.alpa.points = [x1, y1, x2, y2, x3, y3]    
+        
+    def init_alpa_image(self):
+        self.alpa_image = Image(source='images/alpa.png', fit_mode="contain")
+        self.add_widget(self.alpa_image)
+        self.bind(size=self.update_alpa_image)
+        
+    def update_alpa_image(self, *args):
+        #x = (self.width / 2) -( self.alpa_image.width / 2)
+        #base_y = self.alpa_base_y * self.height
+        x = (self.width / 2) - (self.alpa_image.width / 2)
+        base_y = self.alpa_base_y * self.height
+        alpa_width = self.width * 0.3  # Adjust the size as needed
+        alpa_height = self.height * 0.3
+
+        self.alpa_image.pos = (x, base_y)
+        self.alpa_image.size = (alpa_width, alpa_height)    
+        
         
     def init_vertical_lines(self):
         with self.canvas:
-                Color(1, 1, 1)
+                Color(0.88, 0.77, 0.66)
                 for i in range(0, self.vertical_line_number):
                     self.vertical_lines.append(Line())
                     
                 
     def init_horizontal_lines(self):
         with self.canvas:
-                Color(1, 1, 1)
+                Color(0.88, 0.77, 0.66)
                 for i in range(0, self.horizontal_line_number):
                     self.horizontal_lines.append(Line())
 
 
     def init_tiles(self):
         with self.canvas:
-                Color(1, 1, 1)
+                Color(0.88, 0.77, 0.66)
                 for i in range(0, self.number_of_tiles):
                     self.tiles.append(Quad())
                     
                     
     def starting_tiles_coordinates(self):
-        # 15 tiles in a straight line
-        for i in range(0, 15):
+        # 10 tiles in a straight line
+        for i in range(0, 10):
             self.tiles_coordinates.append((0, i))
             
     
@@ -223,7 +242,8 @@ class MainWidget(Widget):
         self.update_vertical_lines()
         self.update_horizontal_lines()
         self.update_tiles()
-        self.update_alpa()
+        # self.update_alpa()
+        self.update_alpa_image()
         
         self.current_offset_y += self.height * (self.speed_y / 500) * time_factor
         self.current_offset_x += self.width * (self.current_speed_x / 500) * time_factor
