@@ -6,7 +6,7 @@ from kivy import platform
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.graphics.context_instructions import Color
-from kivy.graphics.vertex_instructions import Line, Quad
+from kivy.graphics.vertex_instructions import Line, Quad, Triangle
 from kivy.properties import NumericProperty, Clock
 from kivy.uix.widget import Widget
 import random
@@ -19,15 +19,15 @@ class MainWidget(Widget):
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
     
-    vertical_line_number = 8
-    vertical_line_spacing = .2
+    vertical_line_number = 20
+    vertical_line_spacing = 0.3
     vertical_lines = []
     
-    horizontal_line_number = 10
-    horizontal_line_spacing = .1
+    horizontal_line_number = 8
+    horizontal_line_spacing = .25
     horizontal_lines = []
     
-    speed_y = 4
+    speed_y = 5
     current_offset_y = 0
     current_y_loop = 0
     
@@ -39,7 +39,10 @@ class MainWidget(Widget):
     tiles = []
     tiles_coordinates = []
     
-    
+    alpa_width = .1
+    alpa_height = 0.035
+    alpa_base_y = 0.04
+    alpa = None
     
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
@@ -47,7 +50,8 @@ class MainWidget(Widget):
         self.init_vertical_lines()
         self.init_horizontal_lines()
         self.init_tiles()
-        self.starting_lines_coordinates()
+        self.init_alpa()
+        self.starting_tiles_coordinates()
         self.generate_tiles_coordinates()
   
         if self.is_desktop():      
@@ -64,7 +68,26 @@ class MainWidget(Widget):
         else:
             return False
     
+    def init_alpa(self):
+        with self.canvas:
+            Color(0, 0, 0)
+            self.alpa = Triangle()
+            
     
+    def update_alpa(self):
+        center_x = self.width / 2
+        base_y = self.alpa_base_y * self.height
+        
+        alpa_half_width = self.alpa_width * (self.width / 2)
+        alpa_height = base_y + self.alpa_height * self.height
+        
+        x1, y1 = self.transform(center_x - alpa_half_width, base_y)
+        x2, y2 = self.transform(center_x, alpa_height)
+        x3, y3 = self.transform(center_x + alpa_half_width, base_y)
+        
+        
+        self.alpa.points = [x1, y1, x2, y2, x3, y3]    
+        
     def init_vertical_lines(self):
         with self.canvas:
                 Color(1, 1, 1)
@@ -87,16 +110,10 @@ class MainWidget(Widget):
                     
                     
     def starting_tiles_coordinates(self):
-        # 10 tiles in a straight line
-        
-        if len(self.tiles_coordinates) > 0:
-            last_coordinates = self.tiles_coordinates[-1]
-            last_x = last_coordinates[0]
-            last_y = last_coordinates[1] + 1
-        
-        for i in range(len(self.tiles_coordinates), 10):        
-            self.tiles_coordinates.append((last_x, last_y))   
-                    
+        # 15 tiles in a straight line
+        for i in range(0, 15):
+            self.tiles_coordinates.append((0, i))
+            
     
     def generate_tiles_coordinates(self):
         last_x = 0
@@ -206,9 +223,10 @@ class MainWidget(Widget):
         self.update_vertical_lines()
         self.update_horizontal_lines()
         self.update_tiles()
+        self.update_alpa()
         
-        self.current_offset_y += self.speed_y * time_factor
-        self.current_offset_x += self.current_speed_x * time_factor
+        self.current_offset_y += self.height * (self.speed_y / 500) * time_factor
+        self.current_offset_x += self.width * (self.current_speed_x / 500) * time_factor
         
         spacing_y = self.horizontal_line_spacing * self.height
         if self.current_offset_y >= spacing_y:
