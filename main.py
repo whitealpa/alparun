@@ -20,19 +20,19 @@ class MainWidget(Widget):
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
     
-    vertical_line_number = 12
-    vertical_line_spacing = 0.25
+    vertical_line_number = 8
+    vertical_line_spacing = 0.1
     vertical_lines = []
     
-    horizontal_line_number = 8
-    horizontal_line_spacing = .30
+    horizontal_line_number = 15
+    horizontal_line_spacing = .1
     horizontal_lines = []
     
-    speed_y = 5
+    speed_y = 1
     current_offset_y = 0
     current_y_loop = 0
     
-    speed_x = 12
+    speed_x = 1
     current_speed_x = 0
     current_offset_x = 0
     
@@ -40,11 +40,16 @@ class MainWidget(Widget):
     tiles = []
     tiles_coordinates = []
     
+    # Triangle
     alpa_width = .1
     alpa_height = 0.035
     alpa_base_y = 0.04
     alpa = None
+    alpa_cooridnates = [(0, 0), (0, 0), (0, 0)]
+    
+    # Sprite
     alpa_image = None
+    alpa_image_coordinates = [(0, 0), (0, 0), (0, 0), (0, 0)]
     
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
@@ -52,8 +57,8 @@ class MainWidget(Widget):
         self.init_vertical_lines()
         self.init_horizontal_lines()
         self.init_tiles()
-        # self.init_alpa()
-        self.init_alpa_image()
+        self.init_alpa()
+        # self.init_alpa_image()
         self.starting_tiles_coordinates()
         self.generate_tiles_coordinates()
   
@@ -83,11 +88,20 @@ class MainWidget(Widget):
         alpa_half_width = self.alpa_width * (self.width / 2)
         alpa_height = base_y + self.alpa_height * self.height
         
-        x1, y1 = self.transform(center_x - alpa_half_width, base_y) 
+        self.alpa_coordinates[0] = center_x - alpa_half_width, base_y
+        self.alpa_coordinates[0] = center_x - alpa_half_width, base_y        
+        self.alpa_coordinates[0] = center_x - alpa_half_width, base_y
+                
+        x1, y1 = self.transform(*self.alpa_coordinates[0]) 
         x2, y2 = self.transform(center_x, alpa_height)
         x3, y3 = self.transform(center_x + alpa_half_width, base_y)
         
         self.alpa.points = [x1, y1, x2, y2, x3, y3] 
+        
+    
+    def check_player_collision(self, ti_x, ti_y):
+        xmin, ymin = self.get_tile_coordinates(ti_x, ti_y)
+        xmax, ymanx = self.get_title_coordinates(ti_x + 1, ti_y + 1)
         
         
     def init_alpa_image(self):
@@ -96,8 +110,7 @@ class MainWidget(Widget):
         self.bind(size=self.update_alpa_image)
         
     def update_alpa_image(self, *args):
-        #x = (self.width / 2) -( self.alpa_image.width / 2)
-        #base_y = self.alpa_base_y * self.height
+
         x = (self.width / 2) - (self.alpa_image.width / 2)
         base_y = self.alpa_base_y * self.height
         alpa_width = self.width * 0.3  # Adjust the size as needed
@@ -242,8 +255,8 @@ class MainWidget(Widget):
         self.update_vertical_lines()
         self.update_horizontal_lines()
         self.update_tiles()
-        # self.update_alpa()
-        self.update_alpa_image()
+        self.update_alpa()
+        # self.update_alpa_image()
         
         self.current_offset_y += self.height * (self.speed_y / 500) * time_factor
         self.current_offset_x += self.width * (self.current_speed_x / 500) * time_factor
