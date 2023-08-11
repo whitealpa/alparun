@@ -7,32 +7,38 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Line, Quad, Triangle, Rectangle
-from kivy.properties import NumericProperty, Clock
+from kivy.lang.builder import Builder
+from kivy.properties import NumericProperty, Clock, ObjectProperty
 from kivy.uix.image import Image
+from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.widget import Widget
 import random
 
-class MainWidget(Widget):
+Builder.load_file("menu.kv")
+
+class MainWidget(RelativeLayout):
     
     from perspective import transform, transform_2D, transform_perspective
     from user_control import keyboard_closed, on_touch_down, on_touch_up, on_keyboard_down, on_keyboard_up
+    
+    menu_widget = ObjectProperty()
     
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
     
     vertical_line_number = 8
-    vertical_line_spacing = 0.1
+    vertical_line_spacing = 0.4
     vertical_lines = []
     
     horizontal_line_number = 15
     horizontal_line_spacing = .1
     horizontal_lines = []
     
-    speed_y = 1
+    speed_y = 3
     current_offset_y = 0
     current_y_loop = 0
     
-    speed_x = 1
+    speed_x = 8
     current_speed_x = 0
     current_offset_x = 0
     
@@ -45,11 +51,15 @@ class MainWidget(Widget):
     alpa_height = 0.035
     alpa_base_y = 0.04
     alpa = None
-    alpa_cooridnates = [(0, 0), (0, 0), (0, 0)]
+    alpa_coordinates = [(0, 0), (0, 0), (0, 0)]
     
     # Sprite
     alpa_image = None
     alpa_image_coordinates = [(0, 0), (0, 0), (0, 0), (0, 0)]
+    
+    # Game states
+    game_over = False
+    game_started = False
     
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
@@ -89,19 +99,37 @@ class MainWidget(Widget):
         alpa_height = base_y + self.alpa_height * self.height
         
         self.alpa_coordinates[0] = center_x - alpa_half_width, base_y
-        self.alpa_coordinates[0] = center_x - alpa_half_width, base_y        
-        self.alpa_coordinates[0] = center_x - alpa_half_width, base_y
+        self.alpa_coordinates[1] = center_x, alpa_height   
+        self.alpa_coordinates[2] = center_x + alpa_half_width, base_y
                 
         x1, y1 = self.transform(*self.alpa_coordinates[0]) 
-        x2, y2 = self.transform(center_x, alpa_height)
-        x3, y3 = self.transform(center_x + alpa_half_width, base_y)
+        x2, y2 = self.transform(*self.alpa_coordinates[1])
+        x3, y3 = self.transform(*self.alpa_coordinates[2])
         
         self.alpa.points = [x1, y1, x2, y2, x3, y3] 
         
     
-    def check_player_collision(self, ti_x, ti_y):
-        xmin, ymin = self.get_tile_coordinates(ti_x, ti_y)
-        xmax, ymanx = self.get_title_coordinates(ti_x + 1, ti_y + 1)
+    def check_player_collision(self):
+        for i in range(0, len(self.tiles_coordinates)):
+            ti_x, ti_y = self.tiles_coordinates[i]
+            
+            if ti_y > self.current_y_loop + 1:
+                return False
+            
+            if self.check_player_collision_with_tile(ti_x, ti_y):
+                return True
+            
+        return False
+    
+    def check_player_collision_with_tile(self, ti_x, ti_y):        
+        x_min, y_min = self.get_tile_coordinates(ti_x, ti_y)
+        x_max, y_max = self.get_tile_coordinates(ti_x + 1, ti_y + 1)
+        
+        for i in range(0, 3):
+            point_x, point_y = self.alpa_coordinates[i]
+            if x_min <= point_x <= x_max and y_min <= point_y <= y_max:
+                return True
+        return False
         
         
     def init_alpa_image(self):
@@ -258,15 +286,27 @@ class MainWidget(Widget):
         self.update_alpa()
         # self.update_alpa_image()
         
-        self.current_offset_y += self.height * (self.speed_y / 500) * time_factor
-        self.current_offset_x += self.width * (self.current_speed_x / 500) * time_factor
+        if self.game_started and not self.game_over: # Keep running the code if the game has not started or is over.)
+            self.current_offset_y += self.height * (self.speed_y / 500) * time_factor
+            self.current_offset_x += self.width * (self.current_speed_x / 500) * time_factor
+            
+            spacing_y = self.horizontal_line_spacing * self.height
+            
+            while self.current_offset_y >= spacing_y:
+                self.current_offset_y -= spacing_y
+                self.current_y_loop += 1
+                self.generate_tiles_coordinates()
+                # print("loop: " + str(self.current_y_loop))
         
-        spacing_y = self.horizontal_line_spacing * self.height
-        if self.current_offset_y >= spacing_y:
-            self.current_offset_y -= spacing_y
-            self.current_y_loop += 1
-            self.generate_tiles_coordinates()
-            print("loop: " + str(self.current_y_loop))
+        if not self.check_player_collision() and not self.game_over:
+            self.game_over = True
+            self.menu_widget.opacity = 1
+            print("Game Over")
+            
+    def on_menu_button_pressed(self):
+        print("Button")
+        self.game_started = True
+        self.menu_widget.opacity = 0
             
 class AlpaRun(App):
     pass

@@ -1,6 +1,9 @@
+#:import menu menu
+
 MainWidget:
 
 <MainWidget>:
+    menu_widget : menu_widget
     perspective_point_x: self.width / 2
     perspective_point_y: self.height * 0.75
 
@@ -10,3 +13,6 @@ MainWidget:
         Rectangle:
             pos: self.pos
             size: self.size
+
+    MenuWidget:
+        id: menu_widget
