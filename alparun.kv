@@ -4,12 +4,12 @@ MainWidget:
 
 <MainWidget>:
     canvas.before:
-        #Color:
-        #    rgba: 1, 0.98, 0.95, 1  # Set color to white (RGBA: 1, 1, 1, 1)
+        Color:
+            rgba: 1, 0.98, 0.95, 1  # Set color to white (RGBA: 1, 1, 1, 1)
         Rectangle:
             pos: self.pos
             size: self.size
-            source: 'images/bg1.jpg'
+    #        source: 'images/bg1.jpg'
 
     menu_widget : menu_widget
     perspective_point_x: self.width / 2
@@ -19,6 +19,7 @@ MainWidget:
     Label:
         id : high_score
         
+        color : 0.85, 0.55, 0.12
         font_name: "fonts/Cheerful Dynamite Free.ttf"
         text: "High score: " + root.highest_score
         # text: "Score: " + root.current_score
@@ -28,15 +29,13 @@ MainWidget:
         valign: "middle"
         size_hint: .9, .10
         pos_hint: {'right': 0.98, 'top': 0.95}   
-
-    MenuWidget:
-        id: menu_widget
     
     
     # Putting this above the menu widget to display with menu
     Label:
         id : current_score
 
+        color : 0.85, 0.55, 0.12
         font_name: "fonts/Cheerful Dynamite Free.ttf"
         # text: "Highest score: " + root.highest_score
         text: "Score: " + root.current_score
@@ -46,6 +45,9 @@ MainWidget:
         font_size: root.width / 50
         size_hint: .2, .10 
         pos_hint: {'x': 0.02, 'top': 0.95}   
+
+    MenuWidget:
+        id: menu_widget
 
 
 

@@ -69,11 +69,9 @@ class MainWidget(RelativeLayout):
     
     # Audio
     start_sound = None
-    alpa_sound = None
     game_over_impact_sound = None
-    game_over_voice_sound = None
     music_sound = None
-    restart_sound = None
+
     
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
@@ -83,7 +81,7 @@ class MainWidget(RelativeLayout):
         self.init_horizontal_lines()
         self.init_tiles()
         self.init_alpa()
-        # self.init_alpa_image()
+        self.init_alpa_image()
         self.game_restart()
   
         if self.is_desktop():      
@@ -97,9 +95,7 @@ class MainWidget(RelativeLayout):
     def init_audio(self):
         self.start_sound = SoundLoader.load("audio/game_start.wav")
         self.game_over_impact_sound = SoundLoader.load("audio/game_over.wav")
-        self.game_over_voice_sound = SoundLoader.load("audio/gameover_voice.wav")
         self.music_sound = SoundLoader.load("audio/rainbow.wav")
-        self.restart_sound = SoundLoader.load("audio/restart.wav")
         
         # Play music at the start of the app
         self.music_sound.volume = 0.7
@@ -114,9 +110,7 @@ class MainWidget(RelativeLayout):
         
         self.game_over_impact_sound.volume = 1
         self.game_over_impact_sound.pitch = 2.5
-        self.game_over_voice_sound.volume = 0.6
-        self.restart_sound.volume = 0.25
-        
+     
         
     def game_restart(self):
         
@@ -128,6 +122,7 @@ class MainWidget(RelativeLayout):
         fade_in = Animation(volume=0.7, duration=1)  # Fade in duration
         fade_in.start(self.music_sound)
         #self.music_sound.volume = 0.8 # Fade in music volume to normal
+        
                 
         self.current_offset_y = 0
         self.current_y_loop = 0
@@ -149,7 +144,7 @@ class MainWidget(RelativeLayout):
     
     def init_alpa(self):
         with self.canvas:
-            Color(0, 0, 0)
+            Color(0, 0, 0, 0)
             self.alpa = Triangle()
     
     def update_alpa(self):
@@ -192,21 +187,34 @@ class MainWidget(RelativeLayout):
                 return True
         return False
         
-        
-    def init_alpa_image(self):
-        self.alpa_image = Image(source='images/alpa.png', fit_mode="contain")
-        self.add_widget(self.alpa_image)
-        self.bind(size=self.update_alpa_image)
-        
+
     def update_alpa_image(self, *args):
 
         x = (self.width / 2) - (self.alpa_image.width / 2)
-        base_y = self.alpa_base_y * self.height
-        alpa_width = self.width * 0.3  # Adjust the size as needed
-        alpa_height = self.height * 0.3
-
+        base_y = self.alpa_base_y * Window.height
+        alpa_width = Window.width * 0.3  # Adjust the size as needed
+        alpa_height = Window.height * 0.3
+    
         self.alpa_image.pos = (x, base_y)
-        self.alpa_image.size = (alpa_width, alpa_height)    
+        self.alpa_image.size = (alpa_width, alpa_height)
+        #print(self.alpa_image.size_hint)
+        
+      
+    def init_alpa_image(self):
+        # Create an instance of Image
+        self.alpa_image = Image(source='images/alpa_run.gif', fit_mode="contain", anim_delay=-1)
+
+        # Set the size and position of the GIF within the RelativeLayout
+        self.alpa_image.size_hint = (None, None)
+        self.alpa_image.size = self.size
+        
+        #self.alpa_image.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+
+        # Add the GIF to the RelativeLayout
+        self.add_widget(self.alpa_image)
+                
+
+        
         
         
     def init_vertical_lines(self):
@@ -296,6 +304,7 @@ class MainWidget(RelativeLayout):
         x = self.get_line_x_from_index(ti_x)
         y = self.get_line_y_from_index(ti_y)
         return x, y
+    
                 
     def update_vertical_lines(self):
         first_index = -int(self.vertical_line_number / 2) + 1
@@ -345,7 +354,7 @@ class MainWidget(RelativeLayout):
         self.update_horizontal_lines()
         self.update_tiles()
         self.update_alpa()
-        # self.update_alpa_image()
+        self.update_alpa_image()
         
         if self.game_started and not self.game_over: # Keep running the code if the game has not started or is over.)
             self.current_offset_y += self.height * (self.speed_y / 500) * time_factor
@@ -368,6 +377,7 @@ class MainWidget(RelativeLayout):
         if not self.check_player_collision() and not self.game_over:
 
             self.game_over_impact_sound.play()
+            self.alpa_image.anim_delay = -1
                     
             fade_out = Animation(volume=0.3, duration=0.5)  # Fade out duration
             fade_out.start(self.music_sound)
@@ -383,8 +393,10 @@ class MainWidget(RelativeLayout):
     def on_menu_button_pressed(self):
         if self.game_over:
             self.start_sound.play()
+            self.alpa_image.anim_delay = 0.10
         elif not self.game_started:
             self.start_sound.play()
+            self.alpa_image.anim_delay = 0.10
         
         # print("Button")
         self.game_restart()
