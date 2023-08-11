@@ -4,11 +4,13 @@ Config.set('graphics', 'height', '400')
 
 from kivy import platform
 from kivy.app import App
+from kivy.animation import Animation
+from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Line, Quad, Triangle, Rectangle
 from kivy.lang.builder import Builder
-from kivy.properties import NumericProperty, Clock, ObjectProperty
+from kivy.properties import Clock, NumericProperty, ObjectProperty, StringProperty
 from kivy.uix.image import Image
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.widget import Widget
@@ -22,6 +24,10 @@ class MainWidget(RelativeLayout):
     from user_control import keyboard_closed, on_touch_down, on_touch_up, on_keyboard_down, on_keyboard_up
     
     menu_widget = ObjectProperty()
+    menu_title = StringProperty("AlpaRun")
+    menu_button_title = StringProperty("Yes!")
+    current_score = StringProperty('0')
+    highest_score = StringProperty('0')
     
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
@@ -34,11 +40,11 @@ class MainWidget(RelativeLayout):
     horizontal_line_spacing = .1
     horizontal_lines = []
     
-    speed_y = 3
+    speed_y = 5
     current_offset_y = 0
     current_y_loop = 0
     
-    speed_x = 8
+    speed_x = 9
     current_speed_x = 0
     current_offset_x = 0
     
@@ -61,16 +67,24 @@ class MainWidget(RelativeLayout):
     game_over = False
     game_started = False
     
+    # Audio
+    start_sound = None
+    alpa_sound = None
+    game_over_impact_sound = None
+    game_over_voice_sound = None
+    music_sound = None
+    restart_sound = None
+    
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
         # print("INIT W: " + str(self.width) + " H: " + str(self.height))
+        self.init_audio()
         self.init_vertical_lines()
         self.init_horizontal_lines()
         self.init_tiles()
         self.init_alpa()
         # self.init_alpa_image()
-        self.starting_tiles_coordinates()
-        self.generate_tiles_coordinates()
+        self.game_restart()
   
         if self.is_desktop():      
             self._keyboard = Window.request_keyboard(self.keyboard_closed, self)
@@ -78,6 +92,53 @@ class MainWidget(RelativeLayout):
             self._keyboard.bind(on_key_up=self.on_keyboard_up)
             
         Clock.schedule_interval(self.update, 1.0 / 60.0)
+        
+        
+    def init_audio(self):
+        self.start_sound = SoundLoader.load("audio/game_start.wav")
+        self.game_over_impact_sound = SoundLoader.load("audio/game_over.wav")
+        self.game_over_voice_sound = SoundLoader.load("audio/gameover_voice.wav")
+        self.music_sound = SoundLoader.load("audio/rainbow.wav")
+        self.restart_sound = SoundLoader.load("audio/restart.wav")
+        
+        # Play music at the start of the app
+        self.music_sound.volume = 0.7
+        self.music_sound.pitch = 1
+        self.music_sound.play()
+        self.music_sound.loop = True
+        
+        
+        # Alpaca sound
+        self.start_sound.volume = 1
+        self.start_sound.pitch = 2.5
+        
+        self.game_over_impact_sound.volume = 1
+        self.game_over_impact_sound.pitch = 2.5
+        self.game_over_voice_sound.volume = 0.6
+        self.restart_sound.volume = 0.25
+        
+        
+    def game_restart(self):
+        
+        if int(self.current_score) > int(self.highest_score): # Record the highest score before reset
+                self.highest_score = self.current_score
+        self.current_score = '0'
+        
+        
+        fade_in = Animation(volume=0.7, duration=1)  # Fade in duration
+        fade_in.start(self.music_sound)
+        #self.music_sound.volume = 0.8 # Fade in music volume to normal
+                
+        self.current_offset_y = 0
+        self.current_y_loop = 0
+        self.current_speed_x = 0
+        self.current_offset_x = 0
+        
+        self.tiles_coordinates = []
+        self.starting_tiles_coordinates()
+        self.generate_tiles_coordinates()
+        
+        self.game_over = False
     
         
     def is_desktop(self):
@@ -295,18 +356,41 @@ class MainWidget(RelativeLayout):
             while self.current_offset_y >= spacing_y:
                 self.current_offset_y -= spacing_y
                 self.current_y_loop += 1
+                
+                # Score tracker
+                self.current_score = str(self.current_y_loop)
+                if int(self.highest_score) < int(self.current_score):
+                    self.highest_score = self.current_score
+                
                 self.generate_tiles_coordinates()
                 # print("loop: " + str(self.current_y_loop))
         
         if not self.check_player_collision() and not self.game_over:
+
+            self.game_over_impact_sound.play()
+                    
+            fade_out = Animation(volume=0.3, duration=0.5)  # Fade out duration
+            fade_out.start(self.music_sound)
+            
             self.game_over = True
+
+            self.menu_title = "Oops! Try again?"        
+            self.menu_button_title = "Yes!"
             self.menu_widget.opacity = 1
-            print("Game Over")
+            
+            # print("Game Over")
             
     def on_menu_button_pressed(self):
-        print("Button")
+        if self.game_over:
+            self.start_sound.play()
+        elif not self.game_started:
+            self.start_sound.play()
+        
+        # print("Button")
+        self.game_restart()
         self.game_started = True
         self.menu_widget.opacity = 0
+        
             
 class AlpaRun(App):
     pass

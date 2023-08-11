@@ -31,6 +31,9 @@ def on_keyboard_down(self, keyboard, keycode, text, modifiers):
     elif keycode[1] == 'right':
         # print("Right arrow")
         self.current_speed_x = - self.speed_x
+    elif keycode[1] == 'enter':
+        if not self.game_started or self.game_over:
+            self.on_menu_button_pressed()
     return True
 
 def on_keyboard_up(self, keyboard, keycode):

@@ -3,16 +3,56 @@
 MainWidget:
 
 <MainWidget>:
+    canvas.before:
+        #Color:
+        #    rgba: 1, 0.98, 0.95, 1  # Set color to white (RGBA: 1, 1, 1, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'images/bg1.jpg'
+
     menu_widget : menu_widget
     perspective_point_x: self.width / 2
     perspective_point_y: self.height * 0.75
 
-    canvas.before:
-        Color:
-            rgba: 1, 0.98, 0.95, 1  # Set color to white (RGBA: 1, 1, 1, 1)
-        Rectangle:
-            pos: self.pos
-            size: self.size
+
+    Label:
+        id : high_score
+        
+        font_name: "fonts/Cheerful Dynamite Free.ttf"
+        text: "High score: " + root.highest_score
+        # text: "Score: " + root.current_score
+        font_size: root.width / 50
+        text_size: self.size
+        halign: "right"
+        valign: "middle"
+        size_hint: .9, .10
+        pos_hint: {'right': 0.98, 'top': 0.95}   
 
     MenuWidget:
         id: menu_widget
+    
+    
+    # Putting this above the menu widget to display with menu
+    Label:
+        id : current_score
+
+        font_name: "fonts/Cheerful Dynamite Free.ttf"
+        # text: "Highest score: " + root.highest_score
+        text: "Score: " + root.current_score
+        text_size: self.size
+        halign: "left"
+        valign: "middle"
+        font_size: root.width / 50
+        size_hint: .2, .10 
+        pos_hint: {'x': 0.02, 'top': 0.95}   
+
+
+
+<LabelEdge@Label>:
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1 # Blue color for the edges
+        Line:
+            width: 1  # Line width
+            rectangle: self.x, self.y, self.width, self.height
