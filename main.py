@@ -72,6 +72,7 @@ class MainWidget(RelativeLayout):
     start_sound = None
     game_over_impact_sound = None
     music_sound = None
+    bell_sound = None
     
     # Game speed
     speed_y = 3
@@ -102,6 +103,7 @@ class MainWidget(RelativeLayout):
         self.start_sound = SoundLoader.load("audio/game_start.wav")
         self.game_over_impact_sound = SoundLoader.load("audio/game_over.wav")
         self.music_sound = SoundLoader.load("audio/rainbow.wav")
+        self.bell_sound = SoundLoader.load("audio/bell.wav")
         
         # Play music at the start of the app
         self.music_sound.volume = 0.7
