@@ -30,8 +30,6 @@ MainWidget:
         size_hint: .9, .10
         pos_hint: {'right': 0.98, 'top': 0.95}   
     
-    
-    # Putting this above the menu widget to display with menu
     Label:
         id : current_score
 
@@ -43,8 +41,21 @@ MainWidget:
         halign: "left"
         valign: "middle"
         font_size: root.width / 50
-        size_hint: .2, .10 
+        size_hint: .4, .10 
         pos_hint: {'x': 0.02, 'top': 0.95}   
+    
+    LabelEdge:
+        id : level.text
+
+        color : 0.85, 0.55, 0.12
+        font_name: "fonts/Cheerful Dynamite Free.ttf"
+        text: "Level: " + root.level_text
+        text_size: self.size
+        halign: "center"
+        valign: "middle"
+        font_size: root.width / 50
+        size_hint: .2, .10 
+        pos_hint: {'center_x': 0.5, 'top': 0.95}   
 
     MenuWidget:
         id: menu_widget

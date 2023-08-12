@@ -16,18 +16,21 @@ from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.widget import Widget
 import random
 
+
 Builder.load_file("menu.kv")
 
 class MainWidget(RelativeLayout):
     
     from perspective import transform, transform_2D, transform_perspective
     from user_control import keyboard_closed, on_touch_down, on_touch_up, on_keyboard_down, on_keyboard_up
+    from game_speed import game_speed_increase, gradual_speed_increase
     
     menu_widget = ObjectProperty()
     menu_title = StringProperty("AlpaRun")
     menu_button_title = StringProperty("Yes!")
     current_score = StringProperty('0')
     highest_score = StringProperty('0')
+    level_text = StringProperty('1')
     
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
@@ -39,12 +42,10 @@ class MainWidget(RelativeLayout):
     horizontal_line_number = 15
     horizontal_line_spacing = .1
     horizontal_lines = []
-    
-    speed_y = 5
+
     current_offset_y = 0
     current_y_loop = 0
     
-    speed_x = 9
     current_speed_x = 0
     current_offset_x = 0
     
@@ -71,7 +72,13 @@ class MainWidget(RelativeLayout):
     start_sound = None
     game_over_impact_sound = None
     music_sound = None
-
+    
+    # Game speed
+    speed_y = 3
+    speed_x = 7
+    level_triggered = False
+    interval_score = 0
+    level_counter = 1
     
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
@@ -89,8 +96,7 @@ class MainWidget(RelativeLayout):
             self._keyboard.bind(on_key_down=self.on_keyboard_down)
             self._keyboard.bind(on_key_up=self.on_keyboard_up)
             
-        Clock.schedule_interval(self.update, 1.0 / 60.0)
-        
+        Clock.schedule_interval(self.update, 1.0 / 60.0)        
         
     def init_audio(self):
         self.start_sound = SoundLoader.load("audio/game_start.wav")
@@ -123,6 +129,13 @@ class MainWidget(RelativeLayout):
         fade_in.start(self.music_sound)
         #self.music_sound.volume = 0.8 # Fade in music volume to normal
         
+        # Reset speed
+        self.speed_y = 3
+        self.speed_x = 7
+        self.interval_score = 10
+        self.level_counter = 1
+        self.level_triggered = False
+        self.level_text = '1'
                 
         self.current_offset_y = 0
         self.current_y_loop = 0
@@ -202,7 +215,7 @@ class MainWidget(RelativeLayout):
       
     def init_alpa_image(self):
         # Create an instance of Image
-        self.alpa_image = Image(source='images/alpa_run.gif', fit_mode="contain", anim_delay=-1)
+        self.alpa_image = Image(source='images/alpa_run.gif', fit_mode="contain", anim_delay= -1)
 
         # Set the size and position of the GIF within the RelativeLayout
         self.alpa_image.size_hint = (None, None)
@@ -212,9 +225,6 @@ class MainWidget(RelativeLayout):
 
         # Add the GIF to the RelativeLayout
         self.add_widget(self.alpa_image)
-                
-
-        
         
         
     def init_vertical_lines(self):
@@ -269,7 +279,6 @@ class MainWidget(RelativeLayout):
                 random_tiles = 1
             elif last_x >= last_index - 1:
                 random_tiles = 2
-                
 
             if random_tiles == 1: # To the right side
                 last_x += 1
@@ -346,6 +355,10 @@ class MainWidget(RelativeLayout):
             x4, y4 = self.transform(x_max, y_min)
             
             tile.points = [x1, y1, x2, y2, x3, y3, x4, y4]
+    
+    #def game_speed_increases(self):
+
+    
         
     def update(self, dt):
         # print("dt: " + str(dt * 60))
@@ -355,6 +368,8 @@ class MainWidget(RelativeLayout):
         self.update_tiles()
         self.update_alpa()
         self.update_alpa_image()
+        self.game_speed_increase()
+
         
         if self.game_started and not self.game_over: # Keep running the code if the game has not started or is over.)
             self.current_offset_y += self.height * (self.speed_y / 500) * time_factor
@@ -371,6 +386,7 @@ class MainWidget(RelativeLayout):
                 if int(self.highest_score) < int(self.current_score):
                     self.highest_score = self.current_score
                 
+                
                 self.generate_tiles_coordinates()
                 # print("loop: " + str(self.current_y_loop))
         
@@ -379,7 +395,7 @@ class MainWidget(RelativeLayout):
             self.game_over_impact_sound.play()
             self.alpa_image.anim_delay = -1
                     
-            fade_out = Animation(volume=0.3, duration=0.5)  # Fade out duration
+            fade_out = Animation(volume=0.2, duration=0.5)  # Fade out duration
             fade_out.start(self.music_sound)
             
             self.game_over = True
@@ -394,6 +410,7 @@ class MainWidget(RelativeLayout):
         if self.game_over:
             self.start_sound.play()
             self.alpa_image.anim_delay = 0.10
+            
         elif not self.game_started:
             self.start_sound.play()
             self.alpa_image.anim_delay = 0.10
@@ -402,6 +419,7 @@ class MainWidget(RelativeLayout):
         self.game_restart()
         self.game_started = True
         self.menu_widget.opacity = 0
+             
         
             
 class AlpaRun(App):
