@@ -15,7 +15,11 @@ def game_speed_increase(self):
 
         self.bell_sound.play()
         self.level_triggered = True
-        self.interval_score += self.interval_score
+        
+        if self.interval_score > 50:
+            self.interval_score += int(self.interval_score / 4)
+        else:
+            self.interval_score += self.interval_score
         #print(self.interval_score)
         
         
@@ -29,7 +33,11 @@ def game_speed_increase(self):
         #self.music_sound.pitch += 0.022
         self.bell_sound.play()
         self.level_triggered = False
-        self.interval_score += self.interval_score
+        
+        if self.interval_score > 50:
+            self.interval_score += int(self.interval_score / 4)
+        else:
+            self.interval_score += self.interval_score
         #print(self.interval_score)   
 
 

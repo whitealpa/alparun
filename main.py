@@ -1,6 +1,6 @@
 from kivy.config import Config
-Config.set('graphics', 'width', '900')
-Config.set('graphics', 'height', '400')
+Config.set('graphics', 'width', '1350')
+Config.set('graphics', 'height', '600')
 
 from kivy import platform
 from kivy.app import App
@@ -8,7 +8,7 @@ from kivy.animation import Animation
 from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.graphics.context_instructions import Color
-from kivy.graphics.vertex_instructions import Line, Quad, Triangle, Rectangle
+from kivy.graphics.vertex_instructions import Line, Quad, Triangle, Rectangle, Ellipse
 from kivy.lang.builder import Builder
 from kivy.properties import Clock, NumericProperty, ObjectProperty, StringProperty
 from kivy.uix.image import Image
@@ -35,7 +35,7 @@ class MainWidget(RelativeLayout):
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
     
-    vertical_line_number = 8
+    vertical_line_number = 12
     vertical_line_spacing = 0.4
     vertical_lines = []
     
@@ -61,6 +61,7 @@ class MainWidget(RelativeLayout):
     alpa_coordinates = [(0, 0), (0, 0), (0, 0)]
     
     # Sprite
+    alpa_shadow = None
     alpa_image = None
     alpa_image_coordinates = [(0, 0), (0, 0), (0, 0), (0, 0)]
     
@@ -134,7 +135,7 @@ class MainWidget(RelativeLayout):
         # Reset speed
         self.speed_y = 3
         self.speed_x = 7
-        self.interval_score = 10
+        self.interval_score = 20
         self.level_counter = 1
         self.level_triggered = False
         self.level_text = '1'
@@ -161,6 +162,7 @@ class MainWidget(RelativeLayout):
         with self.canvas:
             Color(0, 0, 0, 0)
             self.alpa = Triangle()
+            
     
     def update_alpa(self):
         center_x = self.width / 2
@@ -231,21 +233,22 @@ class MainWidget(RelativeLayout):
         
     def init_vertical_lines(self):
         with self.canvas:
-                Color(0.88, 0.77, 0.66)
+                Color(0.88, 0.77, 0.66, 0)
                 for i in range(0, self.vertical_line_number):
                     self.vertical_lines.append(Line())
                     
                 
     def init_horizontal_lines(self):
         with self.canvas:
-                Color(0.88, 0.77, 0.66)
+                Color(0.59, 0.36, 0.30, 0.2)
                 for i in range(0, self.horizontal_line_number):
                     self.horizontal_lines.append(Line())
 
 
     def init_tiles(self):
         with self.canvas:
-                Color(0.88, 0.77, 0.66)
+                #Color(0.85, 0.70, 0.51) Original
+                Color(0.95, 0.94, 0.87, 1)
                 for i in range(0, self.number_of_tiles):
                     self.tiles.append(Quad())
                     
@@ -391,6 +394,7 @@ class MainWidget(RelativeLayout):
                 
                 self.generate_tiles_coordinates()
                 # print("loop: " + str(self.current_y_loop))
+        
         
         if not self.check_player_collision() and not self.game_over:
 
