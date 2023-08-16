@@ -104,7 +104,7 @@ class MainWidget(RelativeLayout):
     def init_audio(self):
         self.start_sound = SoundLoader.load("audio/game_start.wav")
         self.game_over_impact_sound = SoundLoader.load("audio/game_over.wav")
-        self.music_sound = SoundLoader.load("audio/rainbow.wav")
+        self.music_sound = SoundLoader.load("audio/rainbow_speed.wav")
         self.bell_sound = SoundLoader.load("audio/bell.wav")
         self.gallop_sound = SoundLoader.load("audio/gallop.wav")
         
@@ -422,6 +422,7 @@ class MainWidget(RelativeLayout):
             self.menu_widget.opacity = 1
             
             # print("Game Over")
+        
             
     def on_menu_button_pressed(self):
         if self.game_over:
@@ -430,6 +431,8 @@ class MainWidget(RelativeLayout):
             self.start_sound.play()
             self.gallop_sound.pitch = 1
             self.gallop_sound.play()
+            self.music_sound.stop()
+            self.music_sound.play()
             
             self.alpa_image.anim_delay = 0.10
             
