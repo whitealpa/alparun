@@ -74,6 +74,7 @@ class MainWidget(RelativeLayout):
     game_over_impact_sound = None
     music_sound = None
     bell_sound = None
+    gallop_sound = None
     
     # Game speed
     speed_y = 3
@@ -105,6 +106,7 @@ class MainWidget(RelativeLayout):
         self.game_over_impact_sound = SoundLoader.load("audio/game_over.wav")
         self.music_sound = SoundLoader.load("audio/rainbow.wav")
         self.bell_sound = SoundLoader.load("audio/bell.wav")
+        self.gallop_sound = SoundLoader.load("audio/gallop.wav")
         
         # Play music at the start of the app
         self.music_sound.volume = 0.7
@@ -119,6 +121,9 @@ class MainWidget(RelativeLayout):
         
         self.game_over_impact_sound.volume = 1
         self.game_over_impact_sound.pitch = 2.5
+        
+        # Gallop sound
+        self.gallop_sound.loop = True
      
         
     def game_restart(self):
@@ -131,6 +136,10 @@ class MainWidget(RelativeLayout):
         fade_in = Animation(volume=0.7, duration=1)  # Fade in duration
         fade_in.start(self.music_sound)
         #self.music_sound.volume = 0.8 # Fade in music volume to normal
+        
+        # Reset gallop sound
+        #self.gallop_sound.pitch = 1
+        #self.gallop_sound.play()
         
         # Reset speed
         self.speed_y = 3
@@ -399,6 +408,8 @@ class MainWidget(RelativeLayout):
         if not self.check_player_collision() and not self.game_over:
 
             self.game_over_impact_sound.play()
+            self.gallop_sound.stop()
+            
             self.alpa_image.anim_delay = -1
                     
             fade_out = Animation(volume=0.2, duration=0.5)  # Fade out duration
@@ -414,11 +425,18 @@ class MainWidget(RelativeLayout):
             
     def on_menu_button_pressed(self):
         if self.game_over:
+            
+            # Sound reset
             self.start_sound.play()
+            self.gallop_sound.pitch = 1
+            self.gallop_sound.play()
+            
             self.alpa_image.anim_delay = 0.10
             
         elif not self.game_started:
-            self.start_sound.play()
+            self.start_sound.play() # Alpa voice
+            self.gallop_sound.play() # Gallop voice
+            
             self.alpa_image.anim_delay = 0.10
         
         # print("Button")

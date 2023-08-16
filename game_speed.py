@@ -13,6 +13,8 @@ def game_speed_increase(self):
         
         threading.Thread(target=self.gradual_speed_increase).start()
 
+        self.gallop_sound.pitch += 0.1
+        
         self.bell_sound.play()
         self.level_triggered = True
         
@@ -30,7 +32,8 @@ def game_speed_increase(self):
         
         threading.Thread(target=self.gradual_speed_increase).start()
         
-        #self.music_sound.pitch += 0.022
+        self.gallop_sound.pitch += 0.1
+        
         self.bell_sound.play()
         self.level_triggered = False
         
