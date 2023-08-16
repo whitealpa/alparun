@@ -104,7 +104,7 @@ class MainWidget(RelativeLayout):
     def init_audio(self):
         self.start_sound = SoundLoader.load("audio/game_start.wav")
         self.game_over_impact_sound = SoundLoader.load("audio/game_over.wav")
-        self.music_sound = SoundLoader.load("audio/rainbow_speed.wav")
+        self.music_sound = SoundLoader.load("audio/rainbow_speed.mp3")
         self.bell_sound = SoundLoader.load("audio/bell.wav")
         self.gallop_sound = SoundLoader.load("audio/gallop.wav")
         
