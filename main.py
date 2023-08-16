@@ -72,6 +72,7 @@ class MainWidget(RelativeLayout):
     # Audio
     start_sound = None
     game_over_impact_sound = None
+    intro_sound = None
     music_sound = None
     bell_sound = None
     gallop_sound = None
@@ -104,16 +105,18 @@ class MainWidget(RelativeLayout):
     def init_audio(self):
         self.start_sound = SoundLoader.load("audio/game_start.wav")
         self.game_over_impact_sound = SoundLoader.load("audio/game_over.wav")
+        self.intro_sound = SoundLoader.load("audio/rainbow.wav")
         self.music_sound = SoundLoader.load("audio/rainbow_speed.mp3")
         self.bell_sound = SoundLoader.load("audio/bell.wav")
         self.gallop_sound = SoundLoader.load("audio/gallop.wav")
         
         # Play music at the start of the app
-        self.music_sound.volume = 0.7
-        self.music_sound.pitch = 1
-        self.music_sound.play()
-        self.music_sound.loop = True
+        self.intro_sound.volume = 0.7
+        self.intro_sound.play()
+        self.intro_sound.loop = True
         
+        self.music_sound.volume = 0.7
+
         
         # Alpaca sound
         self.start_sound.volume = 1
@@ -137,9 +140,7 @@ class MainWidget(RelativeLayout):
         fade_in.start(self.music_sound)
         #self.music_sound.volume = 0.8 # Fade in music volume to normal
         
-        # Reset gallop sound
-        #self.gallop_sound.pitch = 1
-        #self.gallop_sound.play()
+
         
         # Reset speed
         self.speed_y = 3
@@ -437,6 +438,14 @@ class MainWidget(RelativeLayout):
             self.alpa_image.anim_delay = 0.10
             
         elif not self.game_started:
+            
+            fade_out = Animation(volume=0.0, duration=0.2)
+            fade_out.start(self.intro_sound)
+            
+            self.music_sound.volume = 0.4
+            self.music_sound.play()
+            self.intro_sound.stop()
+            
             self.start_sound.play() # Alpa voice
             self.gallop_sound.play() # Gallop voice
             
