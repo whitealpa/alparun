@@ -23,7 +23,7 @@ class MainWidget(RelativeLayout):
     
     from perspective import transform, transform_2D, transform_perspective
     from user_control import keyboard_closed, on_touch_down, on_touch_up, on_keyboard_down, on_keyboard_up
-    from game_speed import game_speed_increase, gradual_speed_increase
+    from game_speed import game_speed_increase, gradual_speed_increase, alpa_drooling
     
     menu_widget = ObjectProperty()
     menu_title = StringProperty("AlpaRun")
@@ -64,6 +64,8 @@ class MainWidget(RelativeLayout):
     alpa_shadow = None
     alpa_image = None
     alpa_image_coordinates = [(0, 0), (0, 0), (0, 0), (0, 0)]
+    doughnut = None
+    drooling = None
     
     # Game states
     game_over = False
@@ -93,6 +95,7 @@ class MainWidget(RelativeLayout):
         self.init_tiles()
         self.init_alpa()
         self.init_alpa_image()
+        self.init_doughnut()
         self.game_restart()
   
         if self.is_desktop():      
@@ -214,18 +217,6 @@ class MainWidget(RelativeLayout):
                 return True
         return False
         
-
-    def update_alpa_image(self, *args):
-
-        x = (self.width / 2) - (self.alpa_image.width / 2)
-        base_y = self.alpa_base_y * Window.height
-        alpa_width = Window.width * 0.3  # Adjust the size as needed
-        alpa_height = Window.height * 0.3
-    
-        self.alpa_image.pos = (x, base_y)
-        self.alpa_image.size = (alpa_width, alpa_height)
-        #print(self.alpa_image.size_hint)
-        
       
     def init_alpa_image(self):
         # Create an instance of Image
@@ -240,7 +231,35 @@ class MainWidget(RelativeLayout):
         # Add the GIF to the RelativeLayout
         self.add_widget(self.alpa_image)
         
+    def update_alpa_image(self, *args):
+
+        x = (self.width / 2) - (self.alpa_image.width / 2)
+        base_y = self.alpa_base_y * Window.height
+        alpa_width = Window.width * 0.3  # Adjust the size as needed
+        alpa_height = Window.height * 0.3
+    
+        self.alpa_image.pos = (x, base_y)
+        self.alpa_image.size = (alpa_width, alpa_height)
+        #print(self.alpa_image.size_hint)
         
+        
+    def init_doughnut(self):
+        self.doughnut = Image(source='images/doughnut.gif', fit_mode="contain", anim_delay= 0.1, color=(1,1,1,0.8))
+        self.doughnut.size_hint = (None, None)
+        self.doughnut.size = self.size
+        self.add_widget(self.doughnut)
+        
+    
+    def update_doughnut(self):    
+        x = (self.width / 2) - (self.doughnut.width / 2)
+        y = Window.height * 0.72
+        dough_width = Window.width * 0.25  # Adjust the size as needed
+        dough_height = Window.height * 0.25
+    
+        self.doughnut.pos = (x, y)
+        self.doughnut.size = (dough_width, dough_height)
+             
+              
     def init_vertical_lines(self):
         with self.canvas:
                 Color(0.88, 0.77, 0.66, 0)
@@ -383,6 +402,7 @@ class MainWidget(RelativeLayout):
         self.update_tiles()
         self.update_alpa()
         self.update_alpa_image()
+        self.update_doughnut()
         self.game_speed_increase()
 
         

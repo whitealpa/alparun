@@ -1,4 +1,7 @@
+from kivy.core.window import Window
 from kivy.properties import Clock
+from kivy.uix.image import Image
+
 import time
 import threading
 
@@ -7,6 +10,8 @@ import threading
 def game_speed_increase(self):
      
     if int(self.current_score) == self.interval_score and not self.level_triggered:
+        self.alpa_drooling()
+        
         self.level_counter += 1
         self.level_text = str(self.level_counter)
         #print("Level: ", self.level_counter)
@@ -26,6 +31,8 @@ def game_speed_increase(self):
         
         
     elif int(self.current_score) == self.interval_score and self.level_triggered:
+        self.alpa_drooling()
+        
         self.level_counter += 1
         self.level_text = str(self.level_counter)
         #print("Level: ", self.level_counter)
@@ -56,6 +63,26 @@ def gradual_speed_increase(self):
     self.speed_x += 0.5
 
     self.alpa_image.anim_delay -= 0.01
+    
+
+def alpa_drooling(self):
+        # Create an instance of Image
+        self.drooling = Image(source='images/drooling.gif', fit_mode="contain", anim_delay= 0.1, anim_loop= 1)
+
+        # Set the size and position of the GIF within the RelativeLayout
+        self.drooling.size_hint = (None, None)
+        self.drooling.size = self.size
+
+        x = (Window.width * 0.46)
+        drooling_width = Window.width * 0.2  # Adjust the size as needed
+        drooling_height = Window.height * 0.2
+    
+        self.drooling.pos = (x, self.alpa_image.height)
+        self.drooling.size = (drooling_width, drooling_height)
+        #print(self.alpa_image.size_hint)
+        
+        
+        self.add_widget(self.drooling)
     
 
         
