@@ -171,7 +171,7 @@ class MainWidget(RelativeLayout):
         else:
             return False
     
-    def init_alpa(self):
+    def init_alpa(self): # Use as hit box
         with self.canvas:
             Color(0, 0, 0, 0)
             self.alpa = Triangle()
