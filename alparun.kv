@@ -1,5 +1,135 @@
+#:import menu menu
+
 MainWidget:
 
 <MainWidget>:
+    canvas.before:
+        # White Background
+        Color:
+            rgba: 0.985, 0.965, 0.92, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+        # Sky gradient
+
+        Color:
+            rgba: 0.98, 0.96, 0.90, 1  # Set color to white (RGBA: 1, 1, 1, 1)
+        Rectangle:
+            pos: (0, self.height * 0.725)
+            size: self.size
+        
+        Color:
+            rgba: 0.937, 0.945, 0.909, 1 
+        Rectangle:
+            pos: (0, self.height * 0.75)
+            size: self.size
+
+        Color:
+            rgba: 0.89, 0.93, 0.91, 1 
+        Rectangle:
+            pos: (0, self.height * 0.80)
+            size: self.size
+            
+        Color:
+            rgba: 0.84, 0.91, 0.92, 1 
+        Rectangle:
+            pos: (0, self.height * 0.875)
+            size: self.size
+                    
+        Color:
+            rgba: 0.8, 0.9, 0.92, 1 
+        Rectangle:
+            pos: (0, self.height * 0.975)
+            size: self.size
+
+        # Grass gradient
+        Color: 
+            rgba: 0.88, 0.90, 0.81, 1  # Set color to white (RGBA: 1, 1, 1, 1)
+        Rectangle:
+            pos: self.pos
+            size: (self.width, self.height * 0.7)
+
+        Color: 
+            rgba: 0.84, 0.88, 0.79, 1
+        Rectangle:
+            pos: self.pos
+            size: (self.width, self.height * 0.65)
+
+        Color: 
+            rgba: 0.80, 0.85, 0.76, 1
+        Rectangle:
+            pos: self.pos
+            size: (self.width, self.height * 0.55)
+        
+        Color:
+            rgba: 0.75, 0.82, 0.73, 1 
+        Rectangle:
+            pos: self.pos
+            size: (self.width, self.height * 0.40)
+
+        #Rectangle:
+        #    pos: self.pos
+        #    size: self.size
+        #    source: 'images/bg2.jpg'
+
+    menu_widget : menu_widget
     perspective_point_x: self.width / 2
-    perspective_point_y: self.height * 0.7
+    perspective_point_y: self.height * 0.70
+
+    
+
+
+    Label:
+        id : high_score
+        
+        color : 0.59, 0.36, 0.30
+        font_name: "fonts/Cheerful Dynamite Free.ttf"
+        text: "High score: " + root.highest_score
+        # text: "Score: " + root.current_score
+        font_size: root.width / 50
+        text_size: self.size
+        halign: "right"
+        valign: "middle"
+        size_hint: .9, .10
+        pos_hint: {'right': 0.98, 'top': 0.95}   
+    
+    Label:
+        id : current_score
+
+        color : 0.59, 0.36, 0.30
+        font_name: "fonts/Cheerful Dynamite Free.ttf"
+        # text: "Highest score: " + root.highest_score
+        text: "Score: " + root.current_score
+        text_size: self.size
+        halign: "left"
+        valign: "middle"
+        font_size: root.width / 50
+        size_hint: .5, .10 
+        pos_hint: {'x': 0.02, 'top': 0.95}   
+    
+    Label:
+        id : level.text
+
+        color : 0.70, 0.58, 0.40,
+        font_name: "fonts/Cheerful Dynamite Free.ttf"
+        text: "Speed: " + root.level_text
+        text_size: self.size
+        halign: "left"
+        valign: "middle"
+        font_size: root.width / 55
+        size_hint: .5, .10 
+        pos_hint: {'x': 0.02, 'y': 0.75}
+
+    MenuWidget:
+        id: menu_widget
+
+
+
+<LabelEdge@Label>:
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1 # Blue color for the edges
+        Line:
+            width: 1  # Line width
+            rectangle: self.x, self.y, self.width, self.height
