@@ -44,17 +44,17 @@ drooling.gif: A drooling thought bubble that activates during speed increase to 
 
 #### Design choices:
 
-Graphics: The game features 2D sprites that aim to create a sense of simplicity, cuteness, and friendliness. Additionally, I wanted to capture the nostalgic vibe of the old SNES game era, which adds a touch of retro charm to the visuals. Enhacning the immersion factor with perspective tricks, allowing the game to create an illusion of depth and a more immersive experience for the players.
+Graphics: The game features 2D sprites that aim to create a sense of simplicity, cuteness, and friendliness. Additionally, I wanted to capture the nostalgic vibe of the old SNES game era, adding retro charm to the visuals. Enhancing the immersion factor with perspective tricks, allows the game to create an illusion of depth and a more immersive experience for the players.
 
 Controls and Gameplay Mechanics: I originally intended it to be a mobile game with only touch controls, allowing players to move left and right. This design choice was made to maintain the simplicity of the game and make it accessible to a wide range of players. By having minimal controls, the game allows players to focus on a single, straightforward task. The intention was to create a no-brainer game that people can play to have fun and relax, without the need for complex inputs or strategies.
 
-Game Duration:  I want each round to be relatively short, lasting around 1 minute. I believe this duration aligns well with people's attention spans, allowing them to engage in quick gameplay sessions when they are bored or have a little time to spare.
+Game Duration:  I want each round to be relatively short, lasting around 1 minute. I believe this duration aligns well with people's attention spans, allowing them to engage in quick gameplay sessions when they are bored or have little time to spare.
 
 Difficulty and Progression: The game incorporates a gradual increase in speed over time, which adds to the challenge and fun factor. The game starts with an easy difficulty level and progressively becomes more challenging as the speed increases. This gradual progression allows players to familiarize themselves with the gameplay mechanics and gradually improve their skills as they advance through the game.
 
 #### Final thoughts:
 
-Right now, my code is a bit messy, but my main goal is to make everything work smoothly. However, I know there's room for improvement in designing the game and planning for the future. If I focus on better game design and think ahead, it will make things easier as the game develops further.
+My code is a bit messy, but my main goal is to make everything work smoothly. However, I know there's room for improvement in designing the game and planning for the future. If I focus on better game design and think ahead, it will make things easier as the game develops further.
 
 To improve the game's design, I plan to organize and optimize my code later, making it easier to read and maintain. I'll also consider potential features like new levels or special events. By better planning, I can save time and effort when adding new content.
 
