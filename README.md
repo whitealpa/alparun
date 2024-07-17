@@ -4,11 +4,11 @@
 #### Description:
 
 AlpaRun is a simple running game featuring a white alpaca running on a track to reach the doughnut in the sky.
-The objective of the game is to control the alpaca's movements and guide it to stay on the track (using left and right control keys) while chasing the unreachable doughnut.
+The objective is to control the alpaca's movements and guide it to stay on the track (using left and right control keys) while chasing the unreachable doughnut.
 
 Developing this game has been an incredible experience for me, especially considering it's my first foray into app creation. I dedicated over 40 hours to the development process, and I must say, it was quite the learning curve. Along the way, I encountered my fair share of debugging challenges and moments of frustration. However, I persevered and found joy in the process.
 
-Initially, I started by following a tutorial to create a basic clone, but as time went on, I couldn't resist adding my own personal touches. I wanted to create a game that was accessible to everyone, with simple mechanics that anyone could enjoy. AlpaRun gradually transformed into a unique and captivating experience.
+Initially, I started by following a tutorial to create a basic clone, but as time went on, I couldn't resist adding my personal touches. I wanted to create a game that was accessible to everyone, with simple mechanics that anyone could enjoy. AlpaRun gradually transformed into a unique and captivating experience.
 
 #### Code details:
 
